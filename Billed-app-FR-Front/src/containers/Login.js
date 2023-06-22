@@ -34,7 +34,6 @@ export default class Login {
         PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
         this.document.body.style.backgroundColor="#fff"
       })
-
   }
   // TEST CORRIGER, J'AI REMPLACER LES INPUT DE L'ADMIN PAR ADMIN-EMAIL-INPUT ET ADMIN-PASSWORD-INPUT
   handleSubmitAdmin = e => {
