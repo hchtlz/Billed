@@ -25,17 +25,17 @@ export default class Login {
     }
     this.localStorage.setItem("user", JSON.stringify(user))
     this.login(user)
-      .catch(
-        (err) => this.createUser(user)
-      )
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Bills'])
-        this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-        this.document.body.style.backgroundColor="#fff"
-      })
+    .then(() => {
+      this.onNavigate(ROUTES_PATH['Bills'])
+      this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+      PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+      this.document.body.style.backgroundColor="#fff"
+    })
+    .catch(
+      (err) => this.createUser(user)
+    )
   }
-  // TEST CORRIGER, J'AI REMPLACER LES INPUT DE L'ADMIN PAR ADMIN-EMAIL-INPUT ET ADMIN-PASSWORD-INPUT
+  // TEST CORRIGER, J'AI REMPLACE LES INPUTS DE L'ADMIN PAR ADMIN-EMAIL-INPUT ET ADMIN-PASSWORD-INPUT
   handleSubmitAdmin = e => {
     e.preventDefault()
     const user = {
@@ -46,15 +46,15 @@ export default class Login {
     }
     this.localStorage.setItem("user", JSON.stringify(user))
     this.login(user)
-      .catch(
-        (err) => this.createUser(user)
-      )
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Dashboard'])
-        this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
-        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-        document.body.style.backgroundColor="#fff"
-      })
+    .then(() => {
+      this.onNavigate(ROUTES_PATH['Dashboard'])
+      this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
+      PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+      document.body.style.backgroundColor="#fff"
+    })
+    .catch(
+      (err) => this.createUser(user)
+    )
   }
 
   // not need to cover this function by tests

@@ -91,6 +91,7 @@ describe("Given I am connected as an employee", () => {
   describe("When I complete the requested fields and I submit", () => {
   test("post bill to mock API", async () => {});
   test("post bill to mock API and failed", async () => {});
+  test("post bill to mock API and failed with 404 error", async () => {});
   test("post bill to mock API and failed with 500 error", async () => {});
   });
 });
