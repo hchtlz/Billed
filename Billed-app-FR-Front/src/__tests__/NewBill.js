@@ -5,6 +5,7 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, screen } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
+import NewBillUI from '../views/NewBillUI.js';
 
 import firestore from "../__mocks__/store.js";
 import { Store } from "../__mocks__/store2.js";
@@ -82,8 +83,46 @@ describe("When I do not fill fields && I click on submit button", () => {
 
 // Test Unitaires
 describe("When I fill fields", () => {
-  test("should upload file wrong format", () => {});
-  test("should upload file correct format", () => {});
+  test("should upload file wrong format", () => {
+    // DOM construction
+    document.body.innerHTML = NewBillUI();
+
+    // get DOM element
+    const newBillContainer = new NewBill({
+      document,
+      onNavigate,
+      firestore: null,
+      localStorage: window.localStorage,
+    });
+
+    const handleChangeFile = jest.fn(newBillContainer.handleChangeFile);
+
+    const attachedFile = screen.getByTestId('file');
+    attachedFile.addEventListener('change', handleChangeFile);
+    fireEvent.change(attachedFile, {
+      target: {
+        files: [
+          new File(['document.pdf'], 'document.pdf', {
+            type: 'application/pdf',
+          }),
+        ],
+      },
+    });
+
+    // expected results
+    expect(handleChangeFile).toHaveBeenCalled();
+    expect(attachedFile.files[0].name).toBe('document.pdf');
+
+    // get DOM element
+    const errorMessage = screen.getByTestId('file-error-message');
+
+    // expected results
+    expect(errorMessage.textContent).toEqual(
+      expect.stringContaining(
+        'Invalid file format. Please select a JPG, JPEG, or PNG file.'
+      )
+    );
+  });
 });
 
 // Test d'intégration POST

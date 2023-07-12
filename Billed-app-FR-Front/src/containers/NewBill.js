@@ -29,6 +29,10 @@ export default class NewBill {
     if (!allowedExtensions.includes(fileExtension)) {
       const errorContainer = this.document.querySelector(".file-error");
       errorContainer.textContent = "Invalid file format. Please select a JPG, JPEG, or PNG file.";
+      
+      // add [data-testid="file-error-message"] to the error message
+      errorContainer.setAttribute("data-testid", "file-error-message");
+      
       fileInput.value = ""; // Réinitialiser la valeur du champ de fichier
       return;
     }
@@ -76,6 +80,7 @@ export default class NewBill {
   }
 
   // not need to cover this function by tests
+  /* istanbul ignore next */
   updateBill = (bill) => {
     if (this.store) {
       this.store
