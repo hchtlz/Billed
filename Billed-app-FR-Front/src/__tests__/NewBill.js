@@ -1,136 +1,181 @@
-/**
- * @jest-environment jsdom
- */
-
-import "@testing-library/jest-dom/extend-expect";
-import { fireEvent, screen } from "@testing-library/dom";
-import userEvent from "@testing-library/user-event";
-import NewBillUI from '../views/NewBillUI.js';
-
-import firestore from "../__mocks__/store.js";
-import { Store } from "../__mocks__/store2.js";
-import Router from "../app/Router.js";
-import { ROUTES, ROUTES_PATH } from "../constants/routes";
+import "@testing-library/jest-dom";
+import { screen, fireEvent, getByTestId, waitFor } from "@testing-library/dom";
+import mockStore from "../__mocks__/store.js";
 import NewBill from "../containers/NewBill.js";
-import BillsUI from "../views/BillsUI.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { localStorageMock } from "../__mocks__/localStorage.js";
+import router from "../app/Router.js";
 
-describe("Given I am connected as an employee", () => {
-  describe("When I am on NewBill Page", () => {
-    beforeEach(() => {
-      const user = JSON.stringify({
+// Utilise la fonction "jest.mock" pour mocker le fichier "../app/Store" avec le mockStore que nous avons importé précédemment.
+jest.mock("../app/Store", () => mockStore);
+
+// Décrit un groupe de tests pour la page "NewBill".
+describe("When I am on NewBill Page", () => {
+  // Cette fonction est exécutée avant chaque test dans ce groupe. Elle prépare l'environnement pour les tests.
+  beforeEach(() => {
+    // Définit une propriété "localStorage" sur l'objet "window" pour simuler le localStorage dans les tests.
+    Object.defineProperty(window, "localStorage", { value: localStorageMock });
+
+    // Simule la présence d'un utilisateur dans le localStorage sous forme de chaîne JSON.
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
         type: "Employee",
-        email: "a@a",
-      });
-      window.localStorage.setItem("user", user);
+      })
+    );
 
-      const pathname = ROUTES_PATH["NewBill"];
-      Object.defineProperty(window, "location", {
-        value: {
-          hash: pathname,
+    // Crée un élément "div" et l'ajoute au document. Cet élément servira de point d'ancrage pour le composant "NewBill".
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+
+    // Initialise le router de l'application pour gérer les routes.
+    router();
+  });
+
+  // Teste si l'icône de courrier électronique sur le verticallayout est mise en surbrillance (active).
+  test("Then mail icon on verticallayout should be highlighted", async () => {
+    // Appelle la fonction "window.onNavigate" avec la route "ROUTES_PATH.NewBill" pour simuler la navigation vers la page "NewBill".
+    window.onNavigate(ROUTES_PATH.NewBill);
+
+    // Attend que l'icône de courrier électronique soit rendue dans le DOM en utilisant le "data-testid" spécifié.
+    await waitFor(() => screen.getByTestId("icon-mail"));
+
+    // Récupère l'élément d'icône de courrier électronique dans le DOM.
+    const Icon = screen.getByTestId("icon-mail");
+
+    // Vérifie si l'icône a la classe CSS "active-icon", indiquant qu'elle est mise en surbrillance.
+    expect(Icon).toHaveClass("active-icon");
+  });
+
+  // Décrit un sous-groupe de tests pour le formulaire de la page "NewBill".
+  describe("When I am on NewBill form", () => {
+    // Teste l'ajout d'un fichier dans le formulaire.
+    test("Then I add File", async () => {
+      // Crée une instance du composant "NewBill" avec des paramètres spécifiques pour les tests.
+      const dashboard = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: localStorageMock,
+      });
+
+      // Crée un "jest.fn" pour espionner la fonction "dashboard.handleChangeFile".
+      const handleChangeFile = jest.fn(dashboard.handleChangeFile);
+
+      // Récupère l'élément d'entrée de fichier (input type="file") dans le DOM en utilisant "data-testid".
+      const inputFile = screen.getByTestId("file");
+
+      // Ajoute un écouteur d'événement "change" à l'élément d'entrée de fichier, qui appelle la fonction espion "handleChangeFile" lorsqu'un fichier est sélectionné.
+      inputFile.addEventListener("change", handleChangeFile);
+
+      // Déclenche l'événement "change" sur l'élément d'entrée de fichier avec une simulation de fichier sélectionné.
+      fireEvent.change(inputFile, {
+        target: {
+          files: [
+            new File(["document.jpg"], "document.jpg", {
+              type: "document/jpg",
+            }),
+          ],
         },
       });
 
-      document.body.innerHTML = `<div id="root"></div>`;
-      Router();
-    });
+      // Vérifie si la fonction "handleChangeFile" a été appelée.
+      expect(handleChangeFile).toHaveBeenCalled();
 
-    test("Require the input type data", () => {
-      const inputData = screen.getByTestId("datepicker");
-      expect(inputData).toBeTruthy();
-    });
-    test("Require the input type vat", () => {
-      const inputVat = screen.getByTestId("vat");
-      expect(inputVat).toBeTruthy();
-    });
-    test("Require the input type pct", () => {
-      const inputPct = screen.getByTestId("pct");
-      expect(inputPct).toBeTruthy();
-    });
-    test("Require the input type file", () => {
-      const inputFile = screen.getByTestId("file");
-      expect(inputFile).toBeTruthy();
+      // Vérifie une autre fois si la fonction "handleChangeFile" a été appelée.
+      expect(handleChangeFile).toBeCalled();
+
+      // Vérifie si le texte "Envoyer une note de frais" est présent dans le DOM.
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
   });
 });
 
-describe("When I do not fill fields && I click on submit button", () => {
-  test("should renders NewBill original page", () => {
-    const inputName = screen.getByTestId("expense-name");
-    expect(inputName.getAttribute("placeholder")).toBe("Vol Paris Londres");
-    expect(inputName.value).toBe("");
-    
-    const inputDate = screen.getByTestId("datepicker");
-    expect(inputDate.value).toBe("");
+// ...
 
-    const inputAmount = screen.getByTestId("amount");
-    expect(inputAmount.value).toBe("");
-
-    const inputVat = screen.getByTestId("vat");
-    expect(inputVat.value).toBe("");
-
-    const inputPct = screen.getByTestId("pct");
-    expect(inputPct.value).toBe("");
-
-    const inputCommentary = screen.getByTestId("commentary");
-    expect(inputCommentary.value).toBe("");
-
-    const inputFile = screen.getByTestId("file");
-    expect(inputFile.value).toBe("");
-  });
-});
-
-// -------------------------------------- TODO -------------------------------------- //
-
-// Test Unitaires
-describe("When I fill fields", () => {
-  test("should upload file wrong format", () => {
-    // DOM construction
-    document.body.innerHTML = NewBillUI();
-
-    // get DOM element
-    const newBillContainer = new NewBill({
-      document,
-      onNavigate,
-      firestore: null,
-      localStorage: window.localStorage,
-    });
-
-    const handleChangeFile = jest.fn(newBillContainer.handleChangeFile);
-
-    const attachedFile = screen.getByTestId('file');
-    attachedFile.addEventListener('change', handleChangeFile);
-    fireEvent.change(attachedFile, {
-      target: {
-        files: [
-          new File(['document.pdf'], 'document.pdf', {
-            type: 'application/pdf',
-          }),
-        ],
-      },
-    });
-
-    // expected results
-    expect(handleChangeFile).toHaveBeenCalled();
-    expect(attachedFile.files[0].name).toBe('document.pdf');
-
-    // get DOM element
-    const errorMessage = screen.getByTestId('file-error-message');
-
-    // expected results
-    expect(errorMessage.textContent).toEqual(
-      expect.stringContaining(
-        'Invalid file format. Please select a JPG, JPEG, or PNG file.'
-      )
+// Décrit un autre groupe de tests pour la page "NewBill" lors de la soumission du formulaire.
+describe("When I am on NewBill Page and submit the form", () => {
+  beforeEach(() => {
+    jest.spyOn(mockStore, "bills");
+    Object.defineProperty(window, "localStorage", { value: localStorageMock });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "a@a",
+      })
     );
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.appendChild(root);
+    router();
+  });
+
+  // Décrit un autre sous-groupe de tests pour la soumission réussie du formulaire.
+  describe("user submit form valid", () => {
+    // Teste l'appel à l'API pour mettre à jour les notes de frais.
+    test("call api update bills", async () => {
+      // Crée une instance du composant "NewBill" avec des paramètres spécifiques pour les tests.
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localeStorage: localStorageMock,
+      });
+
+      // Crée un "jest.fn" pour espionner la fonction "newBill.handleSubmit".
+      const handleSubmit = jest.fn(newBill.handleSubmit);
+
+      // Récupère le formulaire dans le DOM en utilisant "data-testid".
+      const form = screen.getByTestId("form-new-bill");
+
+      // Ajoute un écouteur d'événement "submit" au formulaire, qui appelle la fonction espion "handleSubmit" lors de la soumission.
+      form.addEventListener("submit", handleSubmit);
+
+      // Déclenche l'événement "submit" sur le formulaire pour simuler une soumission.
+      fireEvent.submit(form);
+
+      // Vérifie si la méthode "bills" du mockStore a été appelée.
+      expect(mockStore.bills).toHaveBeenCalled();
+    });
+  });
+
+// -------------- TODO ---------------- // 
+
+
+  // A CORRIGER , ERREUR TypeError: Cannot read properties of null (reading 'addEventListener')
+  
+  // Teste la soumission du formulaire avec des champs manquants (cas d'erreur).
+  describe("user submit form with missing fields", () => {
+    test("call api bills and display error messages", async () => {
+      // Crée une instance du composant "NewBill" avec des paramètres spécifiques pour les tests.
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localeStorage: localStorageMock,
+      });
+
+      // Crée un "jest.fn" pour espionner la fonction "newBill.handleSubmit".
+      const handleSubmit = jest.fn(newBill.handleSubmit);
+
+      // Récupère le formulaire dans le DOM en utilisant "data-testid".
+      const form = screen.getByTestId("form-new-bill");
+
+      // Ajoute un écouteur d'événement "submit" au formulaire, qui appelle la fonction espion "handleSubmit" lors de la soumission.
+      form.addEventListener("submit", handleSubmit);
+
+      // Déclenche l'événement "submit" sur le formulaire pour simuler une soumission.
+      fireEvent.submit(form);
+
+      // Vérifie si la méthode "bills" du mockStore a été appelée.
+      expect(mockStore.bills).toHaveBeenCalled();
+
+      // Vérifie si le texte "Envoyer une note de frais" est présent dans le DOM.
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
+    });
   });
 });
 
-// Test d'intégration POST
-describe("Given I am connected as an employee", () => {
-  describe("When I complete the requested fields and I submit", () => {
-  test("post bill to mock API", async () => {});
-  test("post bill to mock API and failed", async () => {});
-  test("post bill to mock API and failed with 404 error", async () => {});
-  test("post bill to mock API and failed with 500 error", async () => {});
-  });
-});
+

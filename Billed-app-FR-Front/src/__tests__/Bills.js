@@ -8,11 +8,12 @@ import Bills from "../containers/Bills.js";
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import mockStore from "../__mocks__/store"
+import mockedBills from "../__mocks__/store"
 import router from "../app/Router.js";
 import store2 from "../__mocks__/store2.js";
+import mockedBillsWithoutDate from "../__mocks__/store_without_date.js";
 
-jest.mock("../app/store", () => mockStore)
+jest.mock("../app/store", () => mockedBills)
 
 describe("Étant donné que je suis connecté en tant qu'employé", () => {
   describe("Quand je suis sur la page des factures", () => {
@@ -167,5 +168,41 @@ describe("Given I am a user connected as Employee", () => {
       const message = await screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
     });
+  });
+});
+
+// A corriger
+describe("Test du bloc catch de la méthode getBills", () => {
+  test("should return unformatted date and status on error", async () => {
+    
+    // Créez une instance de la classe Bills avec le mockStore
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    const user = JSON.stringify({
+      type: "Employee",
+    });
+    window.localStorage.setItem("user", user);
+
+    const html = BillsUI({ data: [] });
+    document.body.innerHTML = html;
+
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+    const store = mockedBillsWithoutDate
+    const billsClass = new Bills({
+      document,
+      onNavigate,
+      store,
+      localStorage: window.localStorage,
+    });
+    
+    // Mock de la méthode list pour simuler une erreur
+    // mockedBills.bills().list = jest.fn(() => Promise.reject(new Error("Erreur lors de la récupération des factures")));
+
+    // Exécutez la méthode getBills
+    const bills = await billsClass.getBills();
+    expect(bills[0].date).toEqual(undefined);
   });
 });
