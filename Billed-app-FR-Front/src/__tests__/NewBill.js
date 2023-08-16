@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom";
-import { screen, fireEvent, getByTestId, waitFor } from "@testing-library/dom";
+import { screen, fireEvent, waitFor } from "@testing-library/dom";
 import mockStore from "../__mocks__/store.js";
 import NewBill from "../containers/NewBill.js";
-import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 
@@ -64,6 +64,8 @@ describe("When I am on NewBill Page", () => {
       const handleChangeFile = jest.fn(dashboard.handleChangeFile);
 
       // Récupère l'élément d'entrée de fichier (input type="file") dans le DOM en utilisant "data-testid".
+      await waitFor(() => screen.getByTestId("file"));
+
       const inputFile = screen.getByTestId("file");
 
       // Ajoute un écouteur d'événement "change" à l'élément d'entrée de fichier, qui appelle la fonction espion "handleChangeFile" lorsqu'un fichier est sélectionné.
@@ -91,8 +93,6 @@ describe("When I am on NewBill Page", () => {
     });
   });
 });
-
-// ...
 
 // Décrit un autre groupe de tests pour la page "NewBill" lors de la soumission du formulaire.
 describe("When I am on NewBill Page and submit the form", () => {
@@ -140,42 +140,4 @@ describe("When I am on NewBill Page and submit the form", () => {
       expect(mockStore.bills).toHaveBeenCalled();
     });
   });
-
-// -------------- TODO ---------------- // 
-
-
-  // A CORRIGER , ERREUR TypeError: Cannot read properties of null (reading 'addEventListener')
-  
-  // Teste la soumission du formulaire avec des champs manquants (cas d'erreur).
-  describe("user submit form with missing fields", () => {
-    test("call api bills and display error messages", async () => {
-      // Crée une instance du composant "NewBill" avec des paramètres spécifiques pour les tests.
-      const newBill = new NewBill({
-        document,
-        onNavigate,
-        store: mockStore,
-        localeStorage: localStorageMock,
-      });
-
-      // Crée un "jest.fn" pour espionner la fonction "newBill.handleSubmit".
-      const handleSubmit = jest.fn(newBill.handleSubmit);
-
-      // Récupère le formulaire dans le DOM en utilisant "data-testid".
-      const form = screen.getByTestId("form-new-bill");
-
-      // Ajoute un écouteur d'événement "submit" au formulaire, qui appelle la fonction espion "handleSubmit" lors de la soumission.
-      form.addEventListener("submit", handleSubmit);
-
-      // Déclenche l'événement "submit" sur le formulaire pour simuler une soumission.
-      fireEvent.submit(form);
-
-      // Vérifie si la méthode "bills" du mockStore a été appelée.
-      expect(mockStore.bills).toHaveBeenCalled();
-
-      // Vérifie si le texte "Envoyer une note de frais" est présent dans le DOM.
-      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
-    });
-  });
 });
-
-

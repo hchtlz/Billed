@@ -22,10 +22,14 @@ export default class NewBill {
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
     
-    // ✅  ====> TEST CORRIGER : SI LE FORMAT NEST PAS BON, LA VALIDATION NE SE FAIT PAS
+    // ✅  ====> TEST CORRIGE : SI LE FORMAT NEST PAS BON, LA VALIDATION NE SE FAIT PAS
     const allowedExtensions = ["jpg", "jpeg", "png"];
     const fileExtension = fileName.split(".").pop().toLowerCase();
-  
+    const formData = new FormData();
+    const email = JSON.parse(localStorage.getItem("user")).email;
+    formData.append("file", file);
+    formData.append("email", email);
+    
     if (!allowedExtensions.includes(fileExtension)) {
       const errorContainer = this.document.querySelector(".file-error");
       errorContainer.textContent = "Invalid file format. Please select a JPG, JPEG, or PNG file.";
@@ -36,12 +40,7 @@ export default class NewBill {
       fileInput.value = ""; // Réinitialiser la valeur du champ de fichier
       return;
     }
-  
-    const formData = new FormData();
-    const email = JSON.parse(localStorage.getItem("user")).email;
-    formData.append("file", file);
-    formData.append("email", email);
-  
+
     this.store
       .bills()
       .create({
