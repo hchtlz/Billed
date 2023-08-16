@@ -19,44 +19,41 @@ export default class NewBill {
     e.preventDefault();
     const fileInput = this.document.querySelector(`input[data-testid="file"]`);
     const file = fileInput.files[0];
+    const typeName = file.type;
     const filePath = e.target.value.split(/\\/g);
     const fileName = filePath[filePath.length - 1];
-    
-    // ✅  ====> TEST CORRIGE : SI LE FORMAT NEST PAS BON, LA VALIDATION NE SE FAIT PAS
-    const allowedExtensions = ["jpg", "jpeg", "png"];
-    const fileExtension = fileName.split(".").pop().toLowerCase();
     const formData = new FormData();
     const email = JSON.parse(localStorage.getItem("user")).email;
-    formData.append("file", file);
-    formData.append("email", email);
-    
-    if (!allowedExtensions.includes(fileExtension)) {
-      const errorContainer = this.document.querySelector(".file-error");
-      errorContainer.textContent = "Invalid file format. Please select a JPG, JPEG, or PNG file.";
-      
-      // add [data-testid="file-error-message"] to the error message
-      errorContainer.setAttribute("data-testid", "file-error-message");
-      
-      fileInput.value = ""; // Réinitialiser la valeur du champ de fichier
-      return;
-    }
 
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true,
-        },
-      })
-      .then(({ fileUrl, key }) => {
-        this.billId = key;
-        this.fileUrl = fileUrl;
-        this.fileName = fileName;
-      })
-      .catch((error) => console.error(error));
+    if (typeName === 'image/jpg' || typeName === "image/jpeg" || typeName === "image/png") {
+        formData.append('file', file);
+        formData.append('email', email);
+
+        this.store
+            .bills()
+            .create({
+                data: formData,
+                headers: {
+                    noContentType: true
+                }
+            })
+            .then(({ fileUrl, key }) => {
+                this.billId = key;
+                this.fileUrl = fileUrl;
+                this.fileName = fileName;
+            })
+            .catch(error => console.error(error));
+    } else {
+        // Afficher un message d'erreur et laisser le champ vide
+        const errorContainer = this.document.querySelector(".file-error");
+        errorContainer.textContent = "Le format du fichier n'est pas valide.";
+        errorContainer.setAttribute("data-testid", "file-error-message");
+
+        fileInput.value = ""; // Réinitialiser la valeur du champ de fichier
+        this.fileUrl = null;
+        this.fileName = null;
+    }
   };
-  
   handleSubmit = e => {
     e.preventDefault()
     const email = JSON.parse(localStorage.getItem("user")).email
