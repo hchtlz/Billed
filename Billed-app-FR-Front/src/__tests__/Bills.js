@@ -15,9 +15,9 @@ import mockedBillsWithoutDate from "../__mocks__/store_without_date.js";
 
 jest.mock("../app/store", () => mockedBills)
 
-describe("Étant donné que je suis connecté en tant qu'employé", () => {
-  describe("Quand je suis sur la page des factures", () => {
-    test("L'icône des factures dans la mise en page verticale devrait être mise en surbrillance", async () => {
+describe("Given I am connected as an employee", () => {
+  describe("When I am on Bills Page", () => {
+    test("Then bill icon in vertical layout should be highlighted", async () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -171,7 +171,6 @@ describe("Given I am a user connected as Employee", () => {
   });
 });
 
-// A corriger
 describe("Test du bloc catch de la méthode getBills", () => {
   test("should return unformatted date and status on error", async () => {
     
@@ -197,9 +196,6 @@ describe("Test du bloc catch de la méthode getBills", () => {
       store,
       localStorage: window.localStorage,
     });
-    
-    // Mock de la méthode list pour simuler une erreur
-    // mockedBills.bills().list = jest.fn(() => Promise.reject(new Error("Erreur lors de la récupération des factures")));
 
     // Exécutez la méthode getBills
     const bills = await billsClass.getBills();
