@@ -171,7 +171,7 @@ describe("Given I am a user connected as Employee", () => {
   });
 });
 
-describe("Test du bloc catch de la méthode getBills", () => {
+describe("Test of the catch", () => {
   test("should return unformatted date and status on error", async () => {
     
     // Créez une instance de la classe Bills avec le mockStore
