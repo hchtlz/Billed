@@ -145,7 +145,7 @@ export default class {
       this.counter ++
     }
 
-    // ✅  ====> PROBLEME CORRIGE : Utilisation de .off pour éviter les doublons de listeners
+    // ✅  ====> PROBLEME CORRIGE : Utilisation de .off 
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).off().click((e) => this.handleEditTicket(e, bill, bills))
     })

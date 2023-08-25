@@ -35,7 +35,7 @@ export default class Login {
       (err) => this.createUser(user)
     )
   }
-  // TEST CORRIGER, J'AI REMPLACE LES INPUTS DE L'ADMIN PAR ADMIN-EMAIL-INPUT ET ADMIN-PASSWORD-INPUT
+  // ✅ =====> J'AI REMPLACE LES INPUTS DE L'ADMIN PAR ADMIN-EMAIL-INPUT ET ADMIN-PASSWORD-INPUT
   handleSubmitAdmin = e => {
     e.preventDefault()
     const user = {

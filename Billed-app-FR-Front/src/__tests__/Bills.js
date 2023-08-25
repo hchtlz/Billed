@@ -30,26 +30,20 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
 
-      // ✅  ====> Cela vérifie si l'icône des factures est mise en surbrillance comme attendu.
       expect(windowIcon.classList.contains('active-icon')).toBeTruthy()
     });
 
-    // Unit test 
-    // ✅  ====> TRIER LE TABLEAU DANS SON ENTIERTER PLUTOT QUE DE TRIER LES DATES
     // Les factures doivent être triées du plus ancien au plus récent
     test("Then bills should be ordered from earliest to latest", () => {
-      const sortedBills = [...bills].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-      document.body.innerHTML = BillsUI({ data: sortedBills });
-      const dates = screen
-        .getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i)
-        .map((a) => a.innerHTML);
-      const datesSorted = [...dates].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
-      expect(dates).toEqual(datesSorted);
+      document.body.innerHTML = BillsUI({ data: bills })
+      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
+      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
+      const datesSorted = [...dates].sort(antiChrono)
+      expect(dates).toEqual(datesSorted)
     });
   });
 });
 
-// Unit test icon eye 
 describe('When I am on Bills page and I click on the icon eye', () => {
   test('Then a modal should open', () => {
     // set localstorage to mockstorage & user to employee
