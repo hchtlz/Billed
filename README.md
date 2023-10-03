@@ -109,3 +109,9 @@ mot de passe : admin
 utilisateur : employee@test.tld
 mot de passe : employee
 ```
+
+## Auteur
+
+[@hchtlz](https://github.com/hchtlz)
+
+![giphy](https://github.com/hchtlz/Les-Petits-Plats/assets/93914147/46fdd794-2211-44f4-83c0-4cddb23411fd)
