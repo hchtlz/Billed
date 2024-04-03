@@ -1,4 +1,5 @@
-<img src="https://repository-images.githubusercontent.com/448993750/e2838bde-b2f3-4209-a1f1-07f48ca80e3d">
+> [!CAUTION]
+> This repository hosts a project completed as part of my [OpenClassrooms](https://openclassrooms.com) training program. Having successfully completed the program, the project has now been archived and will no longer be actively maintained. Please be aware that while the repository will remain accessible for reference, some links or features may no longer function as intended.
 
 #### Débuggez et testez un SaaS RH
 
